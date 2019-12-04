@@ -1,0 +1,34 @@
+version: "2"
+services:
+  nginx:
+    restart: always
+    image: "nginx:mainline-alpine"
+    ports:
+      - 8080:80
+    volumes:
+      - "./nginx/conf:/etc/nginx/"
+      - "./htdocs:/var/www/html"
+    environment:
+      VIRTUAL_HOST: h-on.machit.link
+      LETSENCRYPT_HOST: h-on.machit.link
+      LETSENCRYPT_EMAIL: kaoru@susture.com
+      TZ: "Asia/Tokyo"
+    depends_on:
+      - phpfpm
+    links:
+      - phpfpm
+    
+  phpfpm:
+    restart: always
+    build: ./phpfpm/
+    environment:
+      TZ: "Asia/Tokyo"
+    volumes:
+      - "./htdocs:/var/www/html"
+    external_links:
+      - mysql
+
+networks:
+  default:
+    external:
+      name: shared
